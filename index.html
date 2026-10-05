@@ -41,12 +41,12 @@
       background: var(--card);
       color: var(--text);
       font: bold 14px Arial, Helvetica, sans-serif;
-      cursor: pointer;
+      text-align: center; text-decoration: none;
       -webkit-tap-highlight-color: transparent;
     }
     .tab:hover { border-color: var(--accent); }
     .tab.active { background: var(--accent); border-color: var(--accent); }
-    .tab[data-tab="live"]::before {
+    .tab.t-live::before {
       content: ""; display: inline-block; width: 8px; height: 8px;
       margin-right: 6px; border-radius: 50%; background: var(--live);
       animation: pulse 1.4s infinite;
@@ -65,11 +65,11 @@
     .banner a, .banner img { display: block; max-width: 100%; height: auto; }
 
     .banner-top {
-      width: 100%; max-width: 970px; min-height: 90px;
+      width: calc(100% - 16px); max-width: 970px; min-height: 90px;
       margin: 12px auto 0;
     }
 
-    /* ---------- ÜMUMİ DÜZƏN: sol banner | widget | sağ banner ---------- */
+    /* ---------- DÜZƏN: sol banner | widget | sağ banner ---------- */
     .layout {
       display: flex; justify-content: center; gap: 12px;
       width: 100%; max-width: 1500px;
@@ -80,15 +80,8 @@
       position: sticky; top: 70px; align-self: flex-start;
     }
     .main { flex: 1 1 auto; min-width: 0; max-width: 900px; }
+    .main img, .main iframe { max-width: 100%; }
 
-    .panel { display: none; }
-    .panel.active { display: block; }
-    .panel iframe {
-      display: block; width: 100%; min-height: 420px;
-      border: 0; background: var(--bg);
-    }
-
-    /* Kiçik ekranlarda yan bannerlər gizlənir */
     @media (max-width: 1200px) {
       .banner-side { display: none; }
     }
@@ -99,7 +92,7 @@
       .layout { padding: 0 4px; margin-top: 8px; }
     }
 
-    /* ---------- ALT LİNK (attribution) ---------- */
+    /* ---------- ALT LİNK ---------- */
     #lsLink {
       visibility: hidden;
       display: block; text-align: center;
@@ -111,16 +104,16 @@
 <body>
 
   <!-- 4 DÜYMƏ -->
-  <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="today"     role="tab">Bu gün</button>
-    <button class="tab"        data-tab="live"      role="tab">Canlı</button>
-    <button class="tab"        data-tab="tomorrow"  role="tab">Sabah</button>
-    <button class="tab"        data-tab="yesterday" role="tab">Dünən</button>
+  <nav class="tabs">
+    <a class="tab" data-tab="today"     href="?list=today">Bu gün</a>
+    <a class="tab t-live" data-tab="live" href="?list=live">Canlı</a>
+    <a class="tab" data-tab="tomorrow"  href="?list=tomorrow">Sabah</a>
+    <a class="tab" data-tab="yesterday" href="?list=yesterday">Dünən</a>
   </nav>
 
-  <!-- ÜST BANNER (düymələrin altında) -->
+  <!-- ÜST BANNER -->
   <div class="banner banner-top" id="bannerTop">
-    <!-- Öz bannerinizi bura qoyun, məsələn:
+    <!-- Nümunə:
     <a href="https://sizin-link.com" target="_blank" rel="noopener sponsored">
       <img src="banner-ust.jpg" alt="">
     </a> -->
@@ -128,85 +121,40 @@
   </div>
 
   <div class="layout">
-    <!-- SOL BANNER -->
-    <aside class="banner banner-side" id="bannerLeft">
-      Sol banner (160×600)
-    </aside>
+    <aside class="banner banner-side" id="bannerLeft">Sol banner (160×600)</aside>
 
-    <!-- ƏSAS HİSSƏ -->
     <main class="main">
-      <section class="panel active" id="panel-today"></section>
-      <section class="panel"        id="panel-live"></section>
-      <section class="panel"        id="panel-tomorrow"></section>
-      <section class="panel"        id="panel-yesterday"></section>
+      <!-- 1) Hansı siyahı olduğunu ünvandan oxuyur: ?list=live -->
+      <script>
+        (function () {
+          var allowed = ["today", "live", "tomorrow", "yesterday"];
+          var list = new URLSearchParams(location.search).get("list");
+          if (allowed.indexOf(list) === -1) list = "today";
+          window.__list = list;
+
+          window.proVars = {"c_bg":"#111328","c_clr":"#ffffff","tar":"#ffffff","l_bg":"#2c2b36","l_fw":"bold","m_bg":"#323343","m_bg2":"#323443","score_bg":"#1aa26e","l_clr":"#ffffff","m_clr":"#ffffff","live_clr":"#ffee00","fa":"Arial, Helvetica, sans-serif","score_bg2":"#007a1f","inc_bg":"#1b1b1d","inc_color":"#eae1e1"};
+          window.proCs = { "list": list };
+        })();
+      </script>
+      <!-- 2) Widget skripti (əvvəlki kimi birbaşa səhifədə) -->
+      <script type="text/javascript" src="https://widgets.proscores.app/njs/en/prolivewidget.js" crossorigin="anonymous" async></script>
     </main>
 
-    <!-- SAĞ BANNER -->
-    <aside class="banner banner-side" id="bannerRight">
-      Sağ banner (160×600)
-    </aside>
+    <aside class="banner banner-side" id="bannerRight">Sağ banner (160×600)</aside>
   </div>
 
   <a id="lsLink" href="https://livescores.pro/" title="livescores">livescores.pro</a>
 
   <script>
-    // Widget rəngləri (bütün tablar üçün ortaq)
-    const PRO_VARS = {"c_bg":"#111328","c_clr":"#ffffff","tar":"#ffffff","l_bg":"#2c2b36","l_fw":"bold","m_bg":"#323343","m_bg2":"#323443","score_bg":"#1aa26e","l_clr":"#ffffff","m_clr":"#ffffff","live_clr":"#ffee00","fa":"Arial, Helvetica, sans-serif","score_bg2":"#007a1f","inc_bg":"#1b1b1d","inc_color":"#eae1e1"};
-    const WIDGET_SRC = "https://widgets.proscores.app/njs/en/prolivewidget.js";
-
-    const loaded = {};
-
-    // Hər tab üçün ayrıca iframe yaradır (global dəyişənlər qarışmasın deyə)
-    function loadPanel(name) {
-      if (loaded[name]) return;
-      loaded[name] = true;
-
-      const html =
-        '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-        '<style>html,body{margin:0;padding:0;background:#111328;overflow:hidden}</style>' +
-        '</head><body>' +
-        '<script>window.proVars=' + JSON.stringify(PRO_VARS) + ';' +
-        'window.proCs=' + JSON.stringify({ list: name }) + ';<\/script>' +
-        '<script src="' + WIDGET_SRC + '" crossorigin="anonymous" async><\/script>' +
-        '</body></html>';
-
-      const frame = document.createElement('iframe');
-      frame.title = name;
-      frame.srcdoc = html;
-      document.getElementById('panel-' + name).appendChild(frame);
-
-      // Iframe hündürlüyünü widgetin məzmununa görə avtomatik təyin et
-      setInterval(() => {
-        try {
-          const d = frame.contentDocument;
-          if (!d) return;
-          const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
-          if (h > 50) frame.style.height = h + 'px';
-        } catch (e) {}
-      }, 500);
-    }
-
-    function openTab(name) {
-      document.querySelectorAll('.tab').forEach(b =>
-        b.classList.toggle('active', b.dataset.tab === name));
-      document.querySelectorAll('.panel').forEach(p =>
-        p.classList.toggle('active', p.id === 'panel-' + name));
-      loadPanel(name);
-      history.replaceState(null, '', '#' + name);
-    }
-
-    document.querySelectorAll('.tab').forEach(b =>
-      b.addEventListener('click', () => openTab(b.dataset.tab)));
-
-    // Açılışda: #live kimi hash varsa onu aç, yoxsa "today"
-    const start = location.hash.replace('#', '');
-    openTab(['today','live','tomorrow','yesterday'].includes(start) ? start : 'today');
+    // Aktiv düyməni işıqlandır
+    document.querySelectorAll('.tab').forEach(function (a) {
+      a.classList.toggle('active', a.dataset.tab === window.__list);
+    });
 
     // Alt link widget yüklənəndən sonra görünür
-    const link = document.getElementById('lsLink');
-    const show = () => link.classList.add('show');
-    window.addEventListener('load', () => setTimeout(show, 3000));
+    var link = document.getElementById('lsLink');
+    var show = function () { link.classList.add('show'); };
+    window.addEventListener('load', function () { setTimeout(show, 3000); });
     setTimeout(show, 8000);
   </script>
 </body>
