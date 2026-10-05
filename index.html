@@ -2,59 +2,208 @@
 <html lang="az">
 <head>
   <meta charset="UTF-8">
-  <!-- MOBİL ÜÇÜN ƏSAS SƏTİR -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Livescore</title>
 
   <style>
+    :root {
+      --bg: #111328;
+      --card: #1b1d38;
+      --line: #2c2f52;
+      --text: #ffffff;
+      --accent: #1aa26e;
+      --live: #ffee00;
+    }
     *, *::before, *::after { box-sizing: border-box; }
 
     html, body {
-      margin: 0;
-      padding: 0;
-      background: #111328;
-      color: #fff;
+      margin: 0; padding: 0;
+      background: var(--bg);
+      color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
       -webkit-text-size-adjust: 100%;
-      overflow-x: hidden;               /* yana sürüşməni önləyir */
+    }
+    body { overflow-x: hidden; }
+
+    /* ---------- DÜYMƏLƏR ---------- */
+    .tabs {
+      position: sticky; top: 0; z-index: 10;
+      display: flex; gap: 8px; justify-content: center;
+      padding: 10px 8px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    .tab {
+      flex: 1 1 0; max-width: 180px;
+      padding: 10px 6px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      font: bold 14px Arial, Helvetica, sans-serif;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab:hover { border-color: var(--accent); }
+    .tab.active { background: var(--accent); border-color: var(--accent); }
+    .tab[data-tab="live"]::before {
+      content: ""; display: inline-block; width: 8px; height: 8px;
+      margin-right: 6px; border-radius: 50%; background: var(--live);
+      animation: pulse 1.4s infinite;
+    }
+    @keyframes pulse { 50% { opacity: .25; } }
+
+    /* ---------- BANNER YERLƏRİ ---------- */
+    .banner {
+      display: flex; align-items: center; justify-content: center;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.03);
+      color: #7d82ad; font-size: 12px; text-align: center;
+      overflow: hidden;
+    }
+    .banner a, .banner img { display: block; max-width: 100%; height: auto; }
+
+    .banner-top {
+      width: 100%; max-width: 970px; min-height: 90px;
+      margin: 12px auto 0;
     }
 
-    /* Widget konteyneri: telefonda tam en, kompüterdə mərkəzdə */
-    .wrap {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 8px;
-      padding-left: max(8px, env(safe-area-inset-left));
-      padding-right: max(8px, env(safe-area-inset-right));
+    /* ---------- ÜMUMİ DÜZƏN: sol banner | widget | sağ banner ---------- */
+    .layout {
+      display: flex; justify-content: center; gap: 12px;
+      width: 100%; max-width: 1500px;
+      margin: 12px auto 0; padding: 0 8px;
+    }
+    .banner-side {
+      flex: 0 0 160px; width: 160px; min-height: 600px;
+      position: sticky; top: 70px; align-self: flex-start;
+    }
+    .main { flex: 1 1 auto; min-width: 0; max-width: 900px; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .panel iframe {
+      display: block; width: 100%; min-height: 420px;
+      border: 0; background: var(--bg);
     }
 
-    /* Widget daxilindəki elementlər ekrandan çıxmasın */
-    .wrap img, .wrap table, .wrap iframe { max-width: 100%; }
-    .wrap table { display: block; overflow-x: auto; }
-
+    /* Kiçik ekranlarda yan bannerlər gizlənir */
+    @media (max-width: 1200px) {
+      .banner-side { display: none; }
+    }
     @media (max-width: 600px) {
-      .wrap { padding: 4px; font-size: 14px; }
+      .tabs { gap: 6px; padding: 8px 6px; }
+      .tab { font-size: 12.5px; padding: 9px 2px; }
+      .banner-top { min-height: 60px; margin-top: 8px; }
+      .layout { padding: 0 4px; margin-top: 8px; }
     }
 
-    /* Link widget açılana qədər gizli */
-    #lsLink { visibility: hidden; display: block; text-align: center; padding: 12px; color: #aaa; font-size: 12px; }
+    /* ---------- ALT LİNK (attribution) ---------- */
+    #lsLink {
+      visibility: hidden;
+      display: block; text-align: center;
+      padding: 16px; color: #8a8fb8; font-size: 12px;
+    }
     #lsLink.show { visibility: visible; }
   </style>
 </head>
 <body>
 
-  <div class="wrap">
-    <!-- WİDGET KODU BURA (köhnəni silib yenisini yapışdırın) -->
-    <script type="text/javascript">window.proVars={"c_bg":"#111328","c_clr":"#ffffff","tar":"#ffffff","l_bg":"#2c2b36","l_fw":"bold","m_bg":"#323343","m_bg2":"#323443","score_bg":"#1aa26e","l_clr":"#ffffff","m_clr":"#ffffff","live_clr":"#ffee00","fa":"Arial, Helvetica, sans-serif","score_bg2":"#007a1f","inc_bg":"#1b1b1d","inc_color":"#eae1e1"};
-    window.proCs={"list":"today"};
-    </script>
-    <script type="text/javascript" src="https://widgets.proscores.app/njs/en/prolivewidget.js" crossorigin="anonymous" async></script>
+  <!-- 4 DÜYMƏ -->
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="today"     role="tab">Bu gün</button>
+    <button class="tab"        data-tab="live"      role="tab">Canlı</button>
+    <button class="tab"        data-tab="tomorrow"  role="tab">Sabah</button>
+    <button class="tab"        data-tab="yesterday" role="tab">Dünən</button>
+  </nav>
 
-    <a id="lsLink" href="https://livescores.pro/" title="live score">livescores.pro</a>
+  <!-- ÜST BANNER (düymələrin altında) -->
+  <div class="banner banner-top" id="bannerTop">
+    <!-- Öz bannerinizi bura qoyun, məsələn:
+    <a href="https://sizin-link.com" target="_blank" rel="noopener sponsored">
+      <img src="banner-ust.jpg" alt="">
+    </a> -->
+    Üst banner (970×90)
   </div>
 
+  <div class="layout">
+    <!-- SOL BANNER -->
+    <aside class="banner banner-side" id="bannerLeft">
+      Sol banner (160×600)
+    </aside>
+
+    <!-- ƏSAS HİSSƏ -->
+    <main class="main">
+      <section class="panel active" id="panel-today"></section>
+      <section class="panel"        id="panel-live"></section>
+      <section class="panel"        id="panel-tomorrow"></section>
+      <section class="panel"        id="panel-yesterday"></section>
+    </main>
+
+    <!-- SAĞ BANNER -->
+    <aside class="banner banner-side" id="bannerRight">
+      Sağ banner (160×600)
+    </aside>
+  </div>
+
+  <a id="lsLink" href="https://livescores.pro/" title="livescores">livescores.pro</a>
+
   <script>
+    // Widget rəngləri (bütün tablar üçün ortaq)
+    const PRO_VARS = {"c_bg":"#111328","c_clr":"#ffffff","tar":"#ffffff","l_bg":"#2c2b36","l_fw":"bold","m_bg":"#323343","m_bg2":"#323443","score_bg":"#1aa26e","l_clr":"#ffffff","m_clr":"#ffffff","live_clr":"#ffee00","fa":"Arial, Helvetica, sans-serif","score_bg2":"#007a1f","inc_bg":"#1b1b1d","inc_color":"#eae1e1"};
+    const WIDGET_SRC = "https://widgets.proscores.app/njs/en/prolivewidget.js";
+
+    const loaded = {};
+
+    // Hər tab üçün ayrıca iframe yaradır (global dəyişənlər qarışmasın deyə)
+    function loadPanel(name) {
+      if (loaded[name]) return;
+      loaded[name] = true;
+
+      const html =
+        '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+        '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+        '<style>html,body{margin:0;padding:0;background:#111328;overflow:hidden}</style>' +
+        '</head><body>' +
+        '<script>window.proVars=' + JSON.stringify(PRO_VARS) + ';' +
+        'window.proCs=' + JSON.stringify({ list: name }) + ';<\/script>' +
+        '<script src="' + WIDGET_SRC + '" crossorigin="anonymous" async><\/script>' +
+        '</body></html>';
+
+      const frame = document.createElement('iframe');
+      frame.title = name;
+      frame.srcdoc = html;
+      document.getElementById('panel-' + name).appendChild(frame);
+
+      // Iframe hündürlüyünü widgetin məzmununa görə avtomatik təyin et
+      setInterval(() => {
+        try {
+          const d = frame.contentDocument;
+          if (!d) return;
+          const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
+          if (h > 50) frame.style.height = h + 'px';
+        } catch (e) {}
+      }, 500);
+    }
+
+    function openTab(name) {
+      document.querySelectorAll('.tab').forEach(b =>
+        b.classList.toggle('active', b.dataset.tab === name));
+      document.querySelectorAll('.panel').forEach(p =>
+        p.classList.toggle('active', p.id === 'panel-' + name));
+      loadPanel(name);
+      history.replaceState(null, '', '#' + name);
+    }
+
+    document.querySelectorAll('.tab').forEach(b =>
+      b.addEventListener('click', () => openTab(b.dataset.tab)));
+
+    // Açılışda: #live kimi hash varsa onu aç, yoxsa "today"
+    const start = location.hash.replace('#', '');
+    openTab(['today','live','tomorrow','yesterday'].includes(start) ? start : 'today');
+
+    // Alt link widget yüklənəndən sonra görünür
     const link = document.getElementById('lsLink');
     const show = () => link.classList.add('show');
     window.addEventListener('load', () => setTimeout(show, 3000));
