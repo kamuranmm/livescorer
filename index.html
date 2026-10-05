@@ -1,21 +1,64 @@
-<style>
-  /* Widget açılana qədər link görünməsin */
-  #lsLink { visibility: hidden; }
-  #lsLink.show { visibility: visible; }
-  body { background:#111328; }  /* ağ fon yanıb-sönməsin */
-</style>
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <!-- MOBİL ÜÇÜN ƏSAS SƏTİR -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Livescore</title>
 
-<script type="text/javascript">window.proVars={"c_bg":"#111328","c_clr":"#ffffff","tar":"#ffffff","l_bg":"#2c2b36","l_fw":"bold","m_bg":"#323343","m_bg2":"#323443","score_bg":"#1aa26e","l_clr":"#ffffff","m_clr":"#ffffff","live_clr":"#ffee00","fa":"Arial, Helvetica, sans-serif","score_bg2":"#007a1f","inc_bg":"#1b1b1d","inc_color":"#eae1e1"};
-window.proCs={"list":"today"};
-</script>
-<script type="text/javascript" src="https://widgets.proscores.app/njs/en/prolivewidget.js" crossorigin="anonymous" async></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
 
-<a id="lsLink" href="https://livescores.pro/" title="live score">livescores.pro</a>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111328;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      overflow-x: hidden;               /* yana sürüşməni önləyir */
+    }
 
-<script>
-  // Widget yüklənəndən sonra linki göstər (ən geci 8 saniyə sonra)
-  const link = document.getElementById('lsLink');
-  const show = () => link.classList.add('show');
-  window.addEventListener('load', () => setTimeout(show, 3000));
-  setTimeout(show, 8000);
-</script>
+    /* Widget konteyneri: telefonda tam en, kompüterdə mərkəzdə */
+    .wrap {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 8px;
+      padding-left: max(8px, env(safe-area-inset-left));
+      padding-right: max(8px, env(safe-area-inset-right));
+    }
+
+    /* Widget daxilindəki elementlər ekrandan çıxmasın */
+    .wrap img, .wrap table, .wrap iframe { max-width: 100%; }
+    .wrap table { display: block; overflow-x: auto; }
+
+    @media (max-width: 600px) {
+      .wrap { padding: 4px; font-size: 14px; }
+    }
+
+    /* Link widget açılana qədər gizli */
+    #lsLink { visibility: hidden; display: block; text-align: center; padding: 12px; color: #aaa; font-size: 12px; }
+    #lsLink.show { visibility: visible; }
+  </style>
+</head>
+<body>
+
+  <div class="wrap">
+    <!-- WİDGET KODU BURA (köhnəni silib yenisini yapışdırın) -->
+    <script type="text/javascript">window.proVars={"c_bg":"#111328","c_clr":"#ffffff","tar":"#ffffff","l_bg":"#2c2b36","l_fw":"bold","m_bg":"#323343","m_bg2":"#323443","score_bg":"#1aa26e","l_clr":"#ffffff","m_clr":"#ffffff","live_clr":"#ffee00","fa":"Arial, Helvetica, sans-serif","score_bg2":"#007a1f","inc_bg":"#1b1b1d","inc_color":"#eae1e1"};
+    window.proCs={"list":"today"};
+    </script>
+    <script type="text/javascript" src="https://widgets.proscores.app/njs/en/prolivewidget.js" crossorigin="anonymous" async></script>
+
+    <a id="lsLink" href="https://livescores.pro/" title="live score">livescores.pro</a>
+  </div>
+
+  <script>
+    const link = document.getElementById('lsLink');
+    const show = () => link.classList.add('show');
+    window.addEventListener('load', () => setTimeout(show, 3000));
+    setTimeout(show, 8000);
+  </script>
+</body>
+</html>
