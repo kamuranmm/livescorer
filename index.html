@@ -71,7 +71,7 @@
 
     /* ---------- DÜZƏN: sol banner | widget | sağ banner ---------- */
     .layout {
-      display: flex; justify-content: center; gap: 12px;
+      display: flex; justify-content: center; align-items: flex-start; gap: 12px;
       width: 100%; max-width: 1500px;
       margin: 12px auto 0; padding: 0 8px;
     }
@@ -79,9 +79,13 @@
       flex: 0 0 160px; width: 160px; min-height: 600px;
       position: sticky; top: 70px; align-self: flex-start;
     }
-    .main { flex: 1 1 auto; min-width: 0; max-width: 900px; }
-    .main img, .main iframe { max-width: 100%; }
+    .main {
+      flex: 1 1 auto; min-width: 0; max-width: 900px;
+      overflow-x: auto;
+    }
+    .main img, .main iframe, .main table { max-width: 100%; }
 
+    /* Tablet və telefon: yan bannerlər gizlənir */
     @media (max-width: 1200px) {
       .banner-side { display: none; }
     }
@@ -90,6 +94,7 @@
       .tab { font-size: 12.5px; padding: 9px 2px; }
       .banner-top { min-height: 60px; margin-top: 8px; }
       .layout { padding: 0 4px; margin-top: 8px; }
+      .main { font-size: 14px; }
     }
 
     /* ---------- ALT LİNK ---------- */
@@ -105,10 +110,10 @@
 
   <!-- 4 DÜYMƏ -->
   <nav class="tabs">
-    <a class="tab" data-tab="today"     href="?list=today">Bu gün</a>
+    <a class="tab" data-tab="today"       href="?list=today">Bu gün</a>
     <a class="tab t-live" data-tab="live" href="?list=live">Canlı</a>
-    <a class="tab" data-tab="tomorrow"  href="?list=tomorrow">Sabah</a>
-    <a class="tab" data-tab="yesterday" href="?list=yesterday">Dünən</a>
+    <a class="tab" data-tab="tomorrow"    href="?list=tomorrow">Sabah</a>
+    <a class="tab" data-tab="yesterday"   href="?list=yesterday">Dünən</a>
   </nav>
 
   <!-- ÜST BANNER -->
@@ -121,9 +126,13 @@
   </div>
 
   <div class="layout">
+    <!-- SOL BANNER -->
     <aside class="banner banner-side" id="bannerLeft">Sol banner (160×600)</aside>
 
+    <!-- ƏSAS HİSSƏ: widget burada göstərilir -->
     <main class="main">
+      <div id="widgetMount"></div>
+
       <!-- 1) Hansı siyahı olduğunu ünvandan oxuyur: ?list=live -->
       <script>
         (function () {
@@ -136,13 +145,16 @@
           window.proCs = { "list": list };
         })();
       </script>
-      <!-- 2) Widget skripti (əvvəlki kimi birbaşa səhifədə) -->
+
+      <!-- 2) Widget skripti -->
       <script type="text/javascript" src="https://widgets.proscores.app/njs/en/prolivewidget.js" crossorigin="anonymous" async></script>
     </main>
 
+    <!-- SAĞ BANNER -->
     <aside class="banner banner-side" id="bannerRight">Sağ banner (160×600)</aside>
   </div>
 
+  <!-- Mənbə linki: yüklənmə zamanı gizli, sonra görünür -->
   <a id="lsLink" href="https://livescores.pro/" title="livescores">livescores.pro</a>
 
   <script>
@@ -151,11 +163,7 @@
       a.classList.toggle('active', a.dataset.tab === window.__list);
     });
 
-    // Alt link widget yüklənəndən sonra görünür
-    var link = document.getElementById('lsLink');
-    var show = function () { link.classList.add('show'); };
-    window.addEventListener('load', function () { setTimeout(show, 3000); });
-    setTimeout(show, 8000);
-  </script>
-</body>
-</html>
+    // Widget body-nin sonuna əlavə olunur; onu avtomatik widgetMount içinə köçür
+    var mount = document.getElementById('widgetMount');
+    var skip = ['SCRIPT', 'STYLE', 'LINK', 'NOSCRIPT'];
+    new
