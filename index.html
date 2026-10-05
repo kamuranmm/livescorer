@@ -5,6 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Livescore</title>
 
+  <!-- Widget body-yə yazdığı elementi ƏSAS HİSSƏYƏ köçürür (widgetdən əvvəl işə düşür) -->
+  <script>
+    (function () {
+      var skipTags = ['SCRIPT', 'STYLE', 'LINK', 'NOSCRIPT', 'META', 'TITLE'];
+      function isOurs(n) {
+        return n.id === 'lsLink' || n.id === 'bannerTop' ||
+               (n.classList && (n.classList.contains('tabs') || n.classList.contains('layout')));
+      }
+      function sweep() {
+        var mount = document.getElementById('widgetMount');
+        if (!mount || !document.body) return;
+        Array.prototype.slice.call(document.body.children).forEach(function (n) {
+          if (skipTags.indexOf(n.tagName) > -1 || isOurs(n)) return;
+          mount.appendChild(n);
+        });
+      }
+      window.__sweep = sweep;
+      new MutationObserver(sweep).observe(document.documentElement, { childList: true, subtree: true });
+      document.addEventListener('DOMContentLoaded', sweep);
+      window.addEventListener('load', sweep);
+      var t = setInterval(sweep, 300);
+      setTimeout(function () { clearInterval(t); sweep(); }, 15000);
+    })();
+  </script>
+
   <style>
     :root {
       --bg: #111328;
@@ -163,7 +188,11 @@
       a.classList.toggle('active', a.dataset.tab === window.__list);
     });
 
-    // Widget body-nin sonuna əlavə olunur; onu avtomatik widgetMount içinə köçür
-    var mount = document.getElementById('widgetMount');
-    var skip = ['SCRIPT', 'STYLE', 'LINK', 'NOSCRIPT'];
-    new
+    // Alt link widget yüklənəndən sonra görünür
+    var link = document.getElementById('lsLink');
+    var show = function () { link.classList.add('show'); };
+    window.addEventListener('load', function () { setTimeout(show, 3000); });
+    setTimeout(show, 8000);
+  </script>
+</body>
+</html>
